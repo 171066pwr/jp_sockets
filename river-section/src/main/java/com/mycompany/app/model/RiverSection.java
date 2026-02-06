@@ -1,5 +1,6 @@
 package com.mycompany.app.model;
 
+import com.mycompany.app.common.*;
 import com.mycompany.app.common.api.RiverSectionApi;
 import lombok.extern.log4j.Log4j2;
 
@@ -41,6 +42,7 @@ public class Environment implements SocketProxyListener, Runnable {
         int roll = rand.nextInt(100);
         currentRainfall = roll < 70 ? 0 : roll - 70;
         updateAllRemotes();
+        log.info(String.format("Rainfall: %d", currentRainfall));
         return currentRainfall;
     }
 

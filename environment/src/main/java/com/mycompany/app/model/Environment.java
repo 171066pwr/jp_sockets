@@ -9,14 +9,15 @@ import java.util.Random;
 
 @Log4j2
 public class Environment implements SocketProxyListener, Runnable {
+    public final String name = "ENVIRONMENT";
     private final OutgoingProxy outgoingProxy;
     private final Random rand = new Random();
-    private final int period;
+    private final long period;
     private int currentRainfall;
 
-    public Environment(int port, int timeout, int period) {
+    public Environment(int port, int timeout, long period) {
         this.period = period;
-        outgoingProxy = new OutgoingProxy(port, timeout);
+        outgoingProxy = new OutgoingProxy(port, name, timeout);
         outgoingProxy.addListener(this);
         new Thread(outgoingProxy).start();
     }
@@ -42,6 +43,7 @@ public class Environment implements SocketProxyListener, Runnable {
         int roll = rand.nextInt(100);
         currentRainfall = roll < 70 ? 0 : roll - 70;
         updateAllRemotes();
+        log.info(String.format("Rainfall: %d", currentRainfall));
         return currentRainfall;
     }
 
