@@ -6,8 +6,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum RetentionBasinApi implements CodedEnum {
+    ASSIGN_RIVER_SECTION(ObjectType.REMOTE_INFO, ObjectType.REQUEST_CODE),
     GET_WATER_DISCHARGE(ObjectType.VOID, ObjectType.INT),
-    GET_FILLING_PERENTAGE(ObjectType.VOID, ObjectType.INT),
+    GET_FILLING_PERCENTAGE(ObjectType.VOID, ObjectType.INT),
     SET_WATER_DISCHARGE(ObjectType.INT, ObjectType.REQUEST_CODE),
     SET_WATER_INFLOW(ObjectType.INT, ObjectType.REQUEST_CODE);
 
@@ -17,5 +18,9 @@ public enum RetentionBasinApi implements CodedEnum {
     @Override
     public boolean matchCode(int code) {
         return this.ordinal() == code;
+    }
+
+    public static RetentionBasinApi getByCode(int code) {
+        return RetentionBasinApi.values()[code];
     }
 }

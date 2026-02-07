@@ -1,0 +1,93 @@
+package com.mycompany.app.model;
+
+import com.mycompany.app.common.*;
+import com.mycompany.app.common.api.ControlCenterApi;
+import com.mycompany.app.common.api.RetentionBasinApi;
+import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Log4j2
+public class ControlCenter extends Service implements Runnable {
+    public ControlCenter(int port, String name) {
+        super(port, name, 0);
+    }
+
+    @Override
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                queryRemotes();
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Override
+    public Response handleRequest(Request request) {
+        Response response = null;
+        try {
+            if (ControlCenterApi.ASSIGN_RETENTION_BASIN.matchCode(request.getCode())) {
+                RemoteInfo remote = new RemoteInfo(request.getData());
+                if (remoteSet.add(remote))  {
+                    response = new Response(ResponseCode.YES, name);
+                }
+            } else {
+                throw new UnsupportedOperationException("Code " + request.getCode());
+            }
+        } catch (Exception e) {
+            response = new Response(ResponseCode.ERROR, name + ": " + e.getMessage());
+        }
+        response = response == null ? new Response(ResponseCode.NO, name) : response;
+        log.info("Request {}: {}", request, response);
+        return response;
+    }
+
+    public Map<RemoteInfo, BasinInfo> queryRemotes() {
+        Map<RemoteInfo, BasinInfo> map = new HashMap<>();
+        for (RemoteInfo remote : remoteSet) {
+            BasinInfo info = new BasinInfo(getFillingPercentage(remote), getDischargeRate(remote));
+            map.put(remote, info);
+            log.info("Remote {}: {}", remote, info);
+        }
+        return map;
+    }
+
+    private Integer getDischargeRate(RemoteInfo remote) {
+        Response response = updateRemote(remote, RetentionBasinApi.GET_WATER_DISCHARGE, "");
+        Integer value = null;
+        if (response.getCode() == ResponseCode.YES) {
+            value = Integer.parseInt(response.getData());
+        }
+        return value;
+    }
+
+    private Integer getFillingPercentage(RemoteInfo remote) {
+        Response response = updateRemote(remote, RetentionBasinApi.GET_FILLING_PERCENTAGE, "");
+        Integer value = null;
+        if (response.getCode() == ResponseCode.YES) {
+            value = Integer.parseInt(response.getData());
+        }
+        return value;
+    }
+
+    @Override
+    public void handleException(Exception e) {
+        log.error(e);
+    }
+
+    @AllArgsConstructor
+    static class BasinInfo {
+        Integer fillingPercentage;
+        Integer dischargeRate;
+
+        @Override
+        public String toString() {
+            return String.format("[%d%%,%d]", fillingPercentage, dischargeRate);
+        }
+    }
+}

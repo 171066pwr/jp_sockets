@@ -14,15 +14,12 @@ import java.util.TimerTask;
 
 @Log4j2
 public class RiverSection extends Service implements RemoteSubscriber {
-    @Getter
-    private final long delay;
     private final int baseFlow;
     private final Map<String, Integer> currentInflows = new HashMap<String, Integer>();
 
     public RiverSection(int port, String name, int baseFlow, long delay) {
-        super(name, port);
+        super(port, name, delay);
         this.baseFlow = baseFlow;
-        this.delay = delay;
     }
 
     @Override
@@ -46,7 +43,7 @@ public class RiverSection extends Service implements RemoteSubscriber {
                 }
                 case SET_REAL_DISCHARGE -> {
                     delayedUpdateSourceInflow(request.getSourceName(), Integer.parseInt(request.getData()));
-                    new Response(ResponseCode.YES, name);
+                    response = new Response(ResponseCode.YES, name);
                     log.info("Discharge received [{}]: {}", request.getSourceName(), request.getData() + " (effective after " + delay + ")");
                 }
             }
@@ -65,20 +62,20 @@ public class RiverSection extends Service implements RemoteSubscriber {
     }
 
     @Override
-    public Response subscribeToRemote(String host, int port) {
-        return updateRemote(host, port, EnvironmentApi.ASSIGN_RIVER_SECTION.ordinal(), getRemoteInfo().toString());
+    public Response subscribeToRemote(RemoteInfo remote) {
+        return updateRemote(remote, EnvironmentApi.ASSIGN_RIVER_SECTION, getRemoteInfo().toString());
     }
 
-    public int getCurrentInflows() {
+    private int getCurrentInflows() {
         return currentInflows.values().stream().reduce(0, Integer::sum);
     }
 
-    public int getTotalOutflow() {
+    private int getTotalOutflow() {
         return baseFlow + getCurrentInflows();
     }
 
     private void updateRemoteBasin(RemoteInfo info) {
-        Response response = updateRemote(info.getHost(), info.getPort(), RetentionBasinApi.SET_WATER_INFLOW.ordinal(), String.valueOf(getTotalOutflow()));
+        Response response = updateRemote(info, RetentionBasinApi.SET_WATER_INFLOW, String.valueOf(getTotalOutflow()));
         log.info(response);
     }
 

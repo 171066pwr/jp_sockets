@@ -13,8 +13,8 @@ public class Environment extends Service implements Runnable {
     private final long period;
     private int currentRainfall;
 
-    public Environment(int port, long period) {
-        super("ENVIRONMENT", port);
+    public Environment(int port, String name, long period) {
+        super(port, name, 0);
         this.period = period;
     }
 
@@ -56,11 +56,6 @@ public class Environment extends Service implements Runnable {
         log.error(e);
     }
 
-    @Override
-    public long getDelay() {
-        return 0;
-    }
-
     private void updateRemote(RemoteInfo info) {
         Response response = updateRemote(info.getHost(), info.getPort(), RiverSectionApi.SET_RAINFALL, String.valueOf(currentRainfall));
         log.info(response);
@@ -68,7 +63,7 @@ public class Environment extends Service implements Runnable {
 
     public void updateRainfall() {
         int roll = rand.nextInt(100);
-        currentRainfall = roll < 50 ? 0 : roll - 70;
+        currentRainfall = roll < 60 ? 0 : roll - 60;
         updateAllRemotes();
         log.info(String.format("Rainfall: %d", currentRainfall));
     }

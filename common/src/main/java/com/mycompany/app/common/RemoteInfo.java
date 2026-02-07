@@ -17,7 +17,11 @@ public class RemoteInfo {
             host = split[0];
             port = Integer.parseInt(split[1]);
             name = split[2];
-            delay = Long.parseLong(split[3]);
+            if (split.length > 3) {
+                delay = Long.parseLong(split[3]);
+            } else {
+                delay = 0;
+            }
         } catch (Exception e) {
             throw new RemoteInfoParseException(info);
         }

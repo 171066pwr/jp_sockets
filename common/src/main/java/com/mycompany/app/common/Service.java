@@ -10,13 +10,16 @@ public abstract class Service implements RemoteActor, SocketListener {
     protected final String name;
     @Getter
     protected final int port;
+    @Getter
+    protected final long delay;
     protected final ServerWrapper incoming;
     protected final Set<RemoteInfo> remoteSet = new HashSet<>();
 
-    protected Service(final String name, final int port) {
+    protected Service(int port, String name, long delay) {
         incoming = new ServerWrapper(port, this);
         this.port = port;
         this.name = name;
+        this.delay = delay;
         new Thread(incoming).start();
     }
 }

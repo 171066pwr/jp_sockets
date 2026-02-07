@@ -26,6 +26,10 @@ public interface RemoteActor {
         return new RemoteInfo(getHost(), getPort(), getName(), getDelay());
     }
 
+    default Response updateRemote(RemoteInfo remote, Enum method, String data) {
+        return updateRemote(remote.host, remote.port, method.ordinal(), data);
+    }
+
     default Response updateRemote(String host, int port, Enum method, String data) {
         return updateRemote(host, port, method.ordinal(), data);
     }
