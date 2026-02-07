@@ -8,6 +8,7 @@ public enum ObjectType {
     LONG,
     STRING,
     BOOLEAN,
-    VOID,
-    REQUEST_CODE
+    REMOTE_INFO,
+    REQUEST_CODE,
+    VOID
 }

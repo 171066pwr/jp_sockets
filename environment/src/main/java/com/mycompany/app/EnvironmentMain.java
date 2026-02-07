@@ -11,7 +11,7 @@ public class EnvironmentMain {
         int port = Integer.parseInt(args[0]);
         long period = args.length < 2 ? 5000: Long.parseLong(args[1]);
 
-        Environment environment = new Environment(port,4000, period);
+        Environment environment = new Environment(port, period);
         new Thread(environment).start();
     }
 }

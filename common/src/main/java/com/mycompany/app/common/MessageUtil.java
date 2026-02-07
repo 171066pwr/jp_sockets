@@ -2,7 +2,7 @@ package com.mycompany.app.common;
 
 import java.util.Arrays;
 
-public class MessageSplitter {
+public class MessageUtil {
     public static final String SEPARATOR = ":";
 
     public static String[] split(String line) {

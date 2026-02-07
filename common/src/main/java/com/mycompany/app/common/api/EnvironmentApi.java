@@ -5,11 +5,8 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum RetentionBasinApi implements CodedEnum {
-    GET_WATER_DISCHARGE(ObjectType.VOID, ObjectType.INT),
-    GET_FILLING_PERENTAGE(ObjectType.VOID, ObjectType.INT),
-    SET_WATER_DISCHARGE(ObjectType.INT, ObjectType.REQUEST_CODE),
-    SET_WATER_INFLOW(ObjectType.INT, ObjectType.REQUEST_CODE);
+public enum EnvironmentApi implements CodedEnum {
+    ASSIGN_RIVER_SECTION(ObjectType.REMOTE_INFO, ObjectType.REQUEST_CODE);
 
     private final ObjectType accepts;
     private final ObjectType returns;
