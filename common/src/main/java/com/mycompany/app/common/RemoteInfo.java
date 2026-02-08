@@ -3,6 +3,8 @@ package com.mycompany.app.common;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
+
 @Getter
 @RequiredArgsConstructor
 public class RemoteInfo {
@@ -29,6 +31,22 @@ public class RemoteInfo {
     @Override
     public String toString() {
         return MessageUtil.combine(host,port,name,delay);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RemoteInfo remoteInfo = (RemoteInfo) o;
+
+        return Objects.equals(this.host, remoteInfo.host)
+        && Objects.equals(this.name, remoteInfo.name)
+        && this.port == remoteInfo.port;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, name, port);
     }
 
     static class RemoteInfoParseException extends RuntimeException {

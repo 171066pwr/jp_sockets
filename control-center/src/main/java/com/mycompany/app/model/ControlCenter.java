@@ -3,28 +3,15 @@ package com.mycompany.app.model;
 import com.mycompany.app.common.*;
 import com.mycompany.app.common.api.ControlCenterApi;
 import com.mycompany.app.common.api.RetentionBasinApi;
-import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Log4j2
-public class ControlCenter extends Service implements Runnable {
+public class ControlCenter extends Service {
     public ControlCenter(int port, String name) {
         super(port, name, 0);
-    }
-
-    @Override
-    public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                queryRemotes();
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
@@ -47,7 +34,12 @@ public class ControlCenter extends Service implements Runnable {
         return response;
     }
 
-    public Map<RemoteInfo, BasinInfo> queryRemotes() {
+    void setDischargeRate(RemoteInfo remote, int dischargeRate) {
+        Response response = updateRemote(remote, RetentionBasinApi.SET_WATER_DISCHARGE, Integer.toString(dischargeRate));
+        log.info("{}: Water discharge set to {}: {}", remote, dischargeRate, response);
+    }
+
+    Map<RemoteInfo, BasinInfo> queryRemotes() {
         Map<RemoteInfo, BasinInfo> map = new HashMap<>();
         for (RemoteInfo remote : remoteSet) {
             BasinInfo info = new BasinInfo(getFillingPercentage(remote), getDischargeRate(remote));
@@ -78,16 +70,5 @@ public class ControlCenter extends Service implements Runnable {
     @Override
     public void handleException(Exception e) {
         log.error(e);
-    }
-
-    @AllArgsConstructor
-    static class BasinInfo {
-        Integer fillingPercentage;
-        Integer dischargeRate;
-
-        @Override
-        public String toString() {
-            return String.format("[%d%%,%d]", fillingPercentage, dischargeRate);
-        }
     }
 }

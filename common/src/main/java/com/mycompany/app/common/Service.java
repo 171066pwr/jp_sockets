@@ -5,12 +5,10 @@ import lombok.Getter;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 public abstract class Service implements RemoteActor, SocketListener {
-    @Getter
     protected final String name;
-    @Getter
     protected final int port;
-    @Getter
     protected final long delay;
     protected final ServerWrapper incoming;
     protected final Set<RemoteInfo> remoteSet = new HashSet<>();

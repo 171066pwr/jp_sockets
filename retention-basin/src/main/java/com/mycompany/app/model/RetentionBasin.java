@@ -44,7 +44,6 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
                 case SET_WATER_INFLOW -> {
                     updateSourceInflow(request.getSourceName(), Integer.parseInt(request.getData()));
                     response = new Response(ResponseCode.YES, name);
-                    updateAllRemotes();
                     log.info("Inflow updated [{}]: {}", request.getSourceName(), request.getData());
                 }
                 case SET_WATER_DISCHARGE -> {
@@ -109,7 +108,7 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
         if (currentVolume > volume) {
             realDischargeRate = currentPlannedDischarge + currentVolume - volume;
         }
-        realDischargeRate = Math.min(realDischargeRate, currentVolume);
+        realDischargeRate = Math.min(currentPlannedDischarge, currentVolume);
         currentVolume -= realDischargeRate;
         updateAllRemotes();
         try {

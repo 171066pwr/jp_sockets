@@ -8,26 +8,12 @@ import lombok.extern.log4j.Log4j2;
 import java.util.Random;
 
 @Log4j2
-public class Environment extends Service implements Runnable {
+public class Environment extends Service {
     private final Random rand = new Random();
-    private final long period;
     private int currentRainfall;
 
-    public Environment(int port, String name, long period) {
+    public Environment(int port, String name) {
         super(port, name, 0);
-        this.period = period;
-    }
-
-    @Override
-    public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            updateRainfall();
-            try {
-                Thread.sleep(period);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
@@ -56,14 +42,12 @@ public class Environment extends Service implements Runnable {
         log.error(e);
     }
 
-    private void updateRemote(RemoteInfo info) {
-        Response response = updateRemote(info.getHost(), info.getPort(), RiverSectionApi.SET_RAINFALL, String.valueOf(currentRainfall));
-        log.info(response);
+    public void setCurrentRainfall(int currentRainfall) {
+        this.currentRainfall = currentRainfall;
+        updateRainfall();
     }
 
     public void updateRainfall() {
-        int roll = rand.nextInt(100);
-        currentRainfall = roll < 60 ? 0 : roll - 60;
         updateAllRemotes();
         log.info(String.format("Rainfall: %d", currentRainfall));
     }
@@ -72,5 +56,10 @@ public class Environment extends Service implements Runnable {
         for(RemoteInfo remote : remoteSet) {
             updateRemote(remote);
         }
+    }
+
+    private void updateRemote(RemoteInfo info) {
+        Response response = updateRemote(info, RiverSectionApi.SET_RAINFALL, String.valueOf(currentRainfall));
+        log.info(response);
     }
 }

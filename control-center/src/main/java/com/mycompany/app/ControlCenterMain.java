@@ -1,6 +1,7 @@
 package com.mycompany.app;
 
 import com.mycompany.app.model.ControlCenter;
+import com.mycompany.app.model.LoadBalancer;
 
 public class ControlCenterMain {
     public static void main(String[] args) {
@@ -11,6 +12,7 @@ public class ControlCenterMain {
         int port = Integer.parseInt(args[0]);
         String name = args[1];
         ControlCenter center = new ControlCenter(port, name);
-        new Thread(center).start();
+        LoadBalancer balancer = new LoadBalancer(center);
+        new Thread(balancer).start();
     }
 }
