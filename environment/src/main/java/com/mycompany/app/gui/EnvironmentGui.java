@@ -41,7 +41,8 @@ public class EnvironmentGui extends JFrame {
 
         if(environment == null) {
             creatorPanel.addCreateListener(e -> {
-                environment = creatorPanel.createEnvironment();
+                setEnvironment(creatorPanel.createEnvironment());
+                environmentPanel.setSelfInfo(environment.getRemoteInfo());
                 CardLayout cl = (CardLayout)(cardPanel.getLayout());
                 cl.show(cardPanel, "environment");
             });
@@ -65,12 +66,15 @@ public class EnvironmentGui extends JFrame {
                 generatorThread.start();
             } else {
                 if(generatorThread != null) {
-                    generatorThread.interrupt();
+                    rainGenerator.kill();
                 }
                 rainGenerator = null;
             }
         });
         environmentPanel.setGeneratorSelected(rainGenerator != null);
+        this.add(cardPanel, BorderLayout.CENTER);
+        this.add(logPanel, BorderLayout.SOUTH);
+        Thread.setDefaultUncaughtExceptionHandler(logPanel);
     }
 
     private void setEnvironment(Environment environment) {

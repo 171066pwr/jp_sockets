@@ -20,6 +20,7 @@ public class EnvironmentPanel extends JPanel {
         super(new GridLayout(8, 2, 5, 5));
         JLabel infoLabel = new JLabel("Environment: ");
         infoTF = new JTextField();
+        infoTF.setEditable(false);
         this.add(infoLabel);
         this.add(infoTF);
 
@@ -62,6 +63,10 @@ public class EnvironmentPanel extends JPanel {
 
     public void setRemotesList(List<RemoteInfo> remotes) {
         remotesList.setListData(remotes.toArray(new RemoteInfo[0]));
+    }
+
+    public void setSelfInfo(RemoteInfo remote) {
+        infoTF.setText(remote.toString());
     }
 
     public int getRainfall() {
