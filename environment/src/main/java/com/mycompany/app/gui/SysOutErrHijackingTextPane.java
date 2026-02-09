@@ -1,5 +1,7 @@
 package com.mycompany.app.gui;
 
+import lombok.extern.log4j.Log4j2;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -7,10 +9,15 @@ import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+@Log4j2
 public class SysOutErrHijackingTextPane extends JTextPane {
     public SysOutErrHijackingTextPane() {
         super();
-        hijackSystemOutput();
+        try {
+            hijackSystemOutput();
+        } catch (IOException e) {
+            log.error(e);
+        }
     }
 
     public void logError(String error) {
@@ -26,18 +33,18 @@ public class SysOutErrHijackingTextPane extends JTextPane {
         } catch (BadLocationException ignored) {}
     }
 
-    private void hijackSystemOutput() {
-        ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baosOut);
-        System.setOut(ps);
-        BufferedReader out =
-                new BufferedReader(new StringReader(baosOut.toString()));
+    private void hijackSystemOutput() throws IOException {
+        PipedOutputStream errOut = new PipedOutputStream();
+        PipedInputStream errIn = new PipedInputStream(errOut);
+        PrintStream errPs = new PrintStream(errOut, true);
+        System.setErr(errPs);
+        BufferedReader err = new BufferedReader(new InputStreamReader(errIn));
 
-        ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
-        PrintStream psErr = new PrintStream(baosOut);
-        System.setErr(psErr);
-        BufferedReader err =
-                new BufferedReader(new StringReader(baosErr.toString()));
+        PipedOutputStream sysOut = new PipedOutputStream();
+        PipedInputStream sysIn = new PipedInputStream(sysOut);
+        PrintStream sysPs = new PrintStream(sysOut, true);
+        System.setOut(sysPs);
+        BufferedReader out = new BufferedReader(new InputStreamReader(sysIn));
 
         Style style = this.addStyle("Red", null);
         StyleConstants.setForeground(style, Color.RED);
@@ -56,10 +63,12 @@ public class SysOutErrHijackingTextPane extends JTextPane {
                 SwingUtilities.invokeLater(() -> {
                     try {
                         doc.insertString(doc.getLength(), text, style);
-                    } catch (BadLocationException ignored) {}
+                    } catch (BadLocationException ignored) {
+                    }
                 });
             }
-        } catch (IOException ignored) {
+            Thread.sleep(3000);
+        } catch (Exception ignored) {
             logError(ignored.getMessage());
         }
     }

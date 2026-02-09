@@ -28,7 +28,6 @@ public class RainGenerator implements Runnable {
             int roll = rand.nextInt(average * 8);
             roll = roll < average * 4 ? 0 : roll - average * 4;
             environment.setCurrentRainfall(roll);
-            System.out.println("working: " + this);
             try {
                 Thread.sleep(period);
             } catch (InterruptedException e) {
