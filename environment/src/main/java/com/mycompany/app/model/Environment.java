@@ -22,7 +22,7 @@ public class Environment extends Service {
         try {
             if (EnvironmentApi.ASSIGN_RIVER_SECTION.matchCode(request.getCode())) {
                 RemoteInfo remote = new RemoteInfo(request.getData());
-                if (remoteSet.add(remote))  {
+                if (addRemote(remote))  {
                     response = new Response(ResponseCode.YES, name);
                     updateRemote(remote);
                 }
@@ -53,7 +53,7 @@ public class Environment extends Service {
     }
 
     private void updateAllRemotes() {
-        for(RemoteInfo remote : remoteSet) {
+        for(RemoteInfo remote : getRemoteSet()) {
             updateRemote(remote);
         }
     }

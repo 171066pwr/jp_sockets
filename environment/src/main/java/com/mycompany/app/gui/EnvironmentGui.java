@@ -5,8 +5,11 @@ import com.mycompany.app.model.RainGenerator;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class EnvironmentGui extends JFrame {
+public class EnvironmentGui extends JFrame implements PropertyChangeListener {
     private Environment environment;
     private RainGenerator rainGenerator;
     private Thread generatorThread;
@@ -15,24 +18,33 @@ public class EnvironmentGui extends JFrame {
     private JPanel cardPanel;
     private LogPanel logPanel;
 
-    public EnvironmentGui(Environment environment) {
+    public EnvironmentGui() {
         super();
-        this.environment = environment;
         createGUI();
     }
 
     public EnvironmentGui(Environment environment, RainGenerator rainGenerator) {
         super();
-        this.environment = environment;
-        this.rainGenerator = rainGenerator;
-        new Thread(rainGenerator).start();
+        setEnvironment(environment, rainGenerator);
         createGUI();
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(WindowEvent winEvt) {
+                System.exit(0);
+            }
+        });
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if(evt.getPropertyName().equals("remoteSet")) {
+            environmentPanel.setRemotesList(environment.getRemotes());
+        }
     }
 
     private void createGUI() {
         BorderLayout borderLayout = new BorderLayout();
         this.setLayout(borderLayout);
-
         creatorPanel = new CreatorPanel();
         environmentPanel = new EnvironmentPanel();
         logPanel = new LogPanel();
@@ -42,12 +54,14 @@ public class EnvironmentGui extends JFrame {
         if(environment == null) {
             creatorPanel.addCreateListener(e -> {
                 setEnvironment(creatorPanel.createEnvironment());
-                environmentPanel.setSelfInfo(environment.getRemoteInfo());
                 CardLayout cl = (CardLayout)(cardPanel.getLayout());
                 cl.show(cardPanel, "environment");
+                updateEnvironmentPanel();
             });
             cardPanel.add(creatorPanel, "creator");
             cardLayout.show(cardPanel, "creator");
+        } else {
+            updateEnvironmentPanel();
         }
         cardPanel.add(environmentPanel, "environment");
 
@@ -58,6 +72,7 @@ public class EnvironmentGui extends JFrame {
                 rainGenerator.setAverage(environmentPanel.getRainfall());
             }
         });
+
         environmentPanel.addGeneratorToggleListener(e -> {
             if(environmentPanel.isRainGenerator()) {
                 rainGenerator = new RainGenerator(environment);
@@ -71,6 +86,7 @@ public class EnvironmentGui extends JFrame {
                 rainGenerator = null;
             }
         });
+
         environmentPanel.setGeneratorSelected(rainGenerator != null);
         this.add(cardPanel, BorderLayout.CENTER);
         this.add(logPanel, BorderLayout.SOUTH);
@@ -78,7 +94,19 @@ public class EnvironmentGui extends JFrame {
     }
 
     private void setEnvironment(Environment environment) {
+        setEnvironment(environment, new RainGenerator(environment));
+    }
+
+    private void setEnvironment(Environment environment, RainGenerator generator) {
         this.environment = environment;
-        this.rainGenerator = new RainGenerator(environment);
+        this.rainGenerator = generator;
+        environment.addPropertyChangeListener(this);
+        generatorThread = new Thread(rainGenerator);
+        generatorThread.start();
+    }
+
+    private void updateEnvironmentPanel() {
+        environmentPanel.setSelfInfo(environment.getRemoteInfo());
+        environmentPanel.setRemotesList(environment.getRemotes());
     }
 }

@@ -13,11 +13,11 @@ public class EnvironmentPanel extends JPanel {
     private JTextField rainfallTF;
     private JButton rainfallBT;
     private JCheckBox rainGeneratorCB;
-    private JList<RemoteInfo> remotesList;
+    private RemoteList remotes;
     private JTextField remotesTF;
 
     EnvironmentPanel() {
-        super(new GridLayout(8, 2, 5, 5));
+        super(new GridLayout(4, 2, 5, 5));
         JLabel infoLabel = new JLabel("Environment: ");
         infoTF = new JTextField();
         infoTF.setEditable(false);
@@ -40,14 +40,12 @@ public class EnvironmentPanel extends JPanel {
         this.add(rainfallTF);
         this.add(rainfallBT);
         this.add(rainGeneratorCB);
-        this.add(new JSeparator());
 
         JLabel listLabel = new JLabel("Subscribed remotes: ");
-        remotesList = new JList<>();
-        remotesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        remotesList.addListSelectionListener(e -> remotesTF.setText(remotesList.getSelectedValue().toString()));
+        remotes = new RemoteList();
+        remotes.addListSelectionListener(e -> remotesTF.setText(remotes.getSelectedValue().toString()));
         this.add(listLabel);
-        this.add(remotesList);
+        this.add(remotes);
         remotesTF = new JTextField();
         remotesTF.setEditable(false);
         this.add(remotesTF);
@@ -61,8 +59,8 @@ public class EnvironmentPanel extends JPanel {
         rainGeneratorCB.addActionListener(l);
     }
 
-    public void setRemotesList(List<RemoteInfo> remotes) {
-        remotesList.setListData(remotes.toArray(new RemoteInfo[0]));
+    public void setRemotesList(List<RemoteInfo> remoteList) {
+        remotes.setRemotes(remoteList);
     }
 
     public void setSelfInfo(RemoteInfo remote) {

@@ -20,7 +20,7 @@ public class ControlCenter extends Service {
         try {
             if (ControlCenterApi.ASSIGN_RETENTION_BASIN.matchCode(request.getCode())) {
                 RemoteInfo remote = new RemoteInfo(request.getData());
-                if (remoteSet.add(remote))  {
+                if (addRemote(remote))  {
                     response = new Response(ResponseCode.YES, name);
                 }
             } else {
@@ -41,7 +41,7 @@ public class ControlCenter extends Service {
 
     Map<RemoteInfo, BasinInfo> queryRemotes() {
         Map<RemoteInfo, BasinInfo> map = new HashMap<>();
-        for (RemoteInfo remote : remoteSet) {
+        for (RemoteInfo remote : getRemoteSet()) {
             BasinInfo info = new BasinInfo(getFillingPercentage(remote), getDischargeRate(remote));
             map.put(remote, info);
             log.info("Remote {}: {}", remote, info);

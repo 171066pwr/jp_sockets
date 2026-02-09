@@ -38,6 +38,5 @@ public class RainGenerator implements Runnable {
 
     public void kill() {
         isAlive.set(false);
-        System.out.println("KILLED: " + this);
     }
 }

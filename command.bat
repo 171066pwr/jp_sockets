@@ -1,4 +1,4 @@
-wt -w 0 nt --title Environment java -jar environment\target\environment.jar 4444 Environment-1 3000 100
+wt -w 0 nt --title Environment java -jar environment\target\environment.jar 4444 Environment-1 3000 200
 wt -w 0 nt --title ControlCenter java -jar control-center\target\control-center.jar 5000 Control
 
 wt -w 0 nt --title Wisla-1 java -jar river-section\target\river-section.jar 4500 Wisla-1 50 10000

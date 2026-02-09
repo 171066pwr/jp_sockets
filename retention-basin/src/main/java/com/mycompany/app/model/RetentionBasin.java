@@ -37,7 +37,7 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
             switch (method) {
                 case ASSIGN_RIVER_SECTION -> {
                     RemoteInfo remote = new RemoteInfo(request.getData());
-                    if (remoteSet.add(remote))  {
+                    if (addRemote(remote))  {
                         response = new Response(ResponseCode.YES, name);
                     }
                 }
@@ -128,7 +128,7 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
     }
 
     private void updateAllRemotes() {
-        for(RemoteInfo remote : remoteSet) {
+        for(RemoteInfo remote : getRemoteSet()) {
             updateRemote(remote);
         }
     }
@@ -138,7 +138,7 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
     }
 
     private int getOutflowNumber() {
-        return remoteSet.size();
+        return getRemoteSet().size();
     }
 
     private int getFillingPercentage() {

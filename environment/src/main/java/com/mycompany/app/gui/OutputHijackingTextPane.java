@@ -1,6 +1,13 @@
 package com.mycompany.app.gui;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.*;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -8,20 +15,22 @@ import java.awt.*;
 import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 @Log4j2
-public class SysOutErrHijackingTextPane extends JTextPane {
-    public SysOutErrHijackingTextPane() {
+public class OutputHijackingTextPane extends JTextPane {
+    public OutputHijackingTextPane() {
         super();
         try {
             hijackSystemOutput();
+            registerAppender();
         } catch (IOException e) {
             log.error(e);
         }
     }
 
     public void logError(String error) {
-        appendLog(error, Color.RED);
+        appendLog(error + "\n", Color.RED);
     }
 
     public void appendLog(String log, Color color) {
@@ -70,6 +79,53 @@ public class SysOutErrHijackingTextPane extends JTextPane {
             Thread.sleep(3000);
         } catch (Exception ignored) {
             logError(ignored.getMessage());
+        }
+    }
+
+    private void registerAppender() {
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        Configuration config = ctx.getConfiguration();
+
+        Layout<?> layout = config.getAppender("SwingAppender").getLayout();
+        SwingAppender appender = new SwingAppender(
+                "SwingAppender",
+                null,
+                layout,
+                event -> {
+                    String msg = layout.toSerializable(event).toString();
+                    if(event.getLevel().equals(Level.ERROR)) {
+                        appendLog(msg, Color.RED);
+                    } else {
+                        appendLog(msg, Color.BLACK);
+                    }
+                }
+        );
+        appender.start();
+        config.addAppender(appender);
+        config.getRootLogger().addAppender(appender, Level.ALL, null);
+        ctx.updateLoggers();
+    }
+
+    @Plugin(
+            name = "SwingAppender",
+            category = Core.CATEGORY_NAME,
+            elementType = Appender.ELEMENT_TYPE
+    )
+    public static class SwingAppender extends AbstractAppender {
+        private final Consumer<LogEvent> consumer;
+
+        protected SwingAppender(
+                String name,
+                Filter filter,
+                Layout<? extends Serializable> layout,
+                Consumer<LogEvent> consumer) {
+            super(name, filter, layout, false, Property.EMPTY_ARRAY);
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void append(LogEvent event) {
+            consumer.accept(event.toImmutable());
         }
     }
 }

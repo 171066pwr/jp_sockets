@@ -7,9 +7,9 @@ import com.mycompany.app.model.RainGenerator;
 public class EnvironmentMain {
     public static void main(String[] args) {
         EnvironmentGui gui;
-        if (args.length < 20) {
+        if (args.length < 2) {
             System.err.println("Pass register port, name and [optional] update period, average rainfall in parameter");
-            gui = new EnvironmentGui(null);
+            gui = new EnvironmentGui();
         } else {
             int port = Integer.parseInt(args[0]);
             String name = args[1];
@@ -20,6 +20,7 @@ public class EnvironmentMain {
             gui = new EnvironmentGui(environment, rainGenerator);
         }
         gui.setSize(600, 400);
+        //gui.pack();
         gui.setVisible(true);
     }
 }

@@ -30,7 +30,7 @@ public class RiverSection extends Service implements RemoteSubscriber {
             switch (method) {
                 case ASSIGN_RETENTION_BASIN -> {
                     RemoteInfo remote = new RemoteInfo(request.getData());
-                    if (remoteSet.add(remote))  {
+                    if (addRemote(remote))  {
                         response = new Response(ResponseCode.YES, name);
                         updateRemoteBasin(remote);
                     }
@@ -99,7 +99,7 @@ public class RiverSection extends Service implements RemoteSubscriber {
     }
 
     private void updateAllRemotes() {
-        for(RemoteInfo remote : remoteSet) {
+        for(RemoteInfo remote : getRemoteSet()) {
             updateRemote(remote);
         }
     }

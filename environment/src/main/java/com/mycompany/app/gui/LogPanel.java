@@ -4,13 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public class LogPanel extends JPanel implements Thread.UncaughtExceptionHandler{
-    private SysOutErrHijackingTextPane logTP;
+    private OutputHijackingTextPane logTP;
     private JButton clearBT;
 
     LogPanel() {
         super();
         setLayout(new BorderLayout(5, 5));
-        logTP = new SysOutErrHijackingTextPane();
+        logTP = new OutputHijackingTextPane();
         logTP.setEditable(false);
         add(new JScrollPane(logTP), BorderLayout.CENTER);
         clearBT = new JButton("Clear");
