@@ -22,7 +22,7 @@ public interface RemoteActor {
         }
     }
 
-    default RemoteInfo getRemoteInfo() {
+    default RemoteInfo getSelfRemoteInfo() {
         return new RemoteInfo(getHost(), getPort(), getName(), getDelay());
     }
 

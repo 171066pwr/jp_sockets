@@ -1,4 +1,4 @@
-package com.mycompany.app.gui;
+package com.mycompany.app.common.gui;
 
 import com.mycompany.app.common.RemoteInfo;
 
@@ -15,6 +15,7 @@ public class RemoteList extends JScrollPane {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setVisibleRowCount(2);
         this.add(list);
+        this.setBorder(BorderFactory.createTitledBorder("Subscribed remotes"));
         this.setViewportView(list);
     }
 

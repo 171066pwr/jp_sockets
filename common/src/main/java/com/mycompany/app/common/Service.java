@@ -27,6 +27,10 @@ public abstract class Service implements RemoteActor, SocketListener {
         new Thread(incoming).start();
     }
 
+    public List<RemoteInfo> getRemotes() {
+        return remoteSet.stream().toList();
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         this.property.addPropertyChangeListener("remoteSet", listener);
     }
@@ -39,7 +43,7 @@ public abstract class Service implements RemoteActor, SocketListener {
         return result;
     }
 
-    public List<RemoteInfo> getRemotes() {
-        return Collections.unmodifiableList(remoteSet.stream().toList());
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        property.firePropertyChange(propertyName, oldValue, newValue);
     }
 }

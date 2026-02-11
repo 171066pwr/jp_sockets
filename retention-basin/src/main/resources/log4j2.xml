@@ -8,6 +8,9 @@
         <Console name="CONSOLE">
             <PatternLayout pattern="%d{HH:mm:ss.sss} %p %c{1}: %m%n"/>
         </Console>
+        <Console name="SwingAppender">
+            <PatternLayout pattern="%d{HH:mm:ss.sss} %p %c{1}: %m%n"/>
+        </Console>
     </Appenders>
     <Loggers>
         <Root level="INFO">

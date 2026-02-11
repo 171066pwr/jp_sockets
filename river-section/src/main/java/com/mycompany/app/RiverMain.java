@@ -28,7 +28,8 @@ public class RiverMain {
 
     static void subscribeToRemote(RiverSection obj, String host, int port) {
         Response response = null;
-        while (response == null || !ResponseCode.YES.equals(response.getCode())) {
+        int retries = 0;
+        while (retries < 5 || response == null || !ResponseCode.YES.equals(response.getCode())) {
             try {
                 response = obj.subscribeToRemote(host, port);
                 log.info(response);

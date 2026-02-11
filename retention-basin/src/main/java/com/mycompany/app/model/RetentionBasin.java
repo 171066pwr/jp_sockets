@@ -3,6 +3,7 @@ package com.mycompany.app.model;
 import com.mycompany.app.common.*;
 import com.mycompany.app.common.api.RetentionBasinApi;
 import com.mycompany.app.common.api.RiverSectionApi;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
@@ -11,6 +12,7 @@ import java.util.*;
 public class RetentionBasin extends Service implements RemoteSubscriber, Runnable {
     private final int volume;
     private final Map<String, Integer> currentInflows = new HashMap<String, Integer>();
+    @Getter
     private RemoteInfo controlCenter;
     private int currentVolume;
     private int realDischargeRate = 0;
@@ -83,7 +85,7 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
 
     @Override
     public Response subscribeToRemote(RemoteInfo remote) {
-        return updateRemote(remote, RiverSectionApi.ASSIGN_RETENTION_BASIN, getRemoteInfo().toString());
+        return updateRemote(remote, RiverSectionApi.ASSIGN_RETENTION_BASIN, getSelfRemoteInfo().toString());
     }
 
     @Override
@@ -92,9 +94,10 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
     }
 
     public void setControlCenter(RemoteInfo remote) {
-        Response response = subscribeWithDelay(remote, 5000);
+        Response response = subscribeWithDelay(remote, 2000);
         if ( ResponseCode.YES.equals(response.getCode()) ) {
             controlCenter = remote;
+            firePropertyChange("controlCenter", null, remote);
         }
         log.info("Control Center subscribed: {}", response);
     }
@@ -107,8 +110,10 @@ public class RetentionBasin extends Service implements RemoteSubscriber, Runnabl
         currentVolume += getCurrentInflows();
         if (currentVolume > volume) {
             realDischargeRate = currentPlannedDischarge + currentVolume - volume;
+        } else {
+            realDischargeRate = currentPlannedDischarge;
         }
-        realDischargeRate = Math.min(currentPlannedDischarge, currentVolume);
+        realDischargeRate = Math.min(realDischargeRate, currentVolume);
         currentVolume -= realDischargeRate;
         updateAllRemotes();
         try {

@@ -1,4 +1,4 @@
-package com.mycompany.app.gui;
+package com.mycompany.app.common.gui;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;
@@ -23,6 +23,7 @@ public class OutputHijackingTextPane extends JTextPane {
         super();
         try {
             hijackSystemOutput();
+            //hijackErrOutput();
             registerAppender();
         } catch (IOException e) {
             log.error(e);
@@ -43,25 +44,31 @@ public class OutputHijackingTextPane extends JTextPane {
     }
 
     private void hijackSystemOutput() throws IOException {
-        PipedOutputStream errOut = new PipedOutputStream();
-        PipedInputStream errIn = new PipedInputStream(errOut);
-        PrintStream errPs = new PrintStream(errOut, true);
-        System.setErr(errPs);
-        BufferedReader err = new BufferedReader(new InputStreamReader(errIn));
-
         PipedOutputStream sysOut = new PipedOutputStream();
         PipedInputStream sysIn = new PipedInputStream(sysOut);
         PrintStream sysPs = new PrintStream(sysOut, true);
         System.setOut(sysPs);
         BufferedReader out = new BufferedReader(new InputStreamReader(sysIn));
 
+        ExecutorService exec = Executors.newFixedThreadPool(1);
+        exec.submit(() -> readStream(out, null));
+    }
+
+    private void hijackErrOutput() throws IOException {
+        PipedOutputStream errOut = new PipedOutputStream();
+        PipedInputStream errIn = new PipedInputStream(errOut);
+        PrintStream errPs = new PrintStream(errOut, true);
+        System.setErr(errPs);
+        BufferedReader err = new BufferedReader(new InputStreamReader(errIn));
+
         Style style = this.addStyle("Red", null);
         StyleConstants.setForeground(style, Color.RED);
 
-        ExecutorService exec = Executors.newFixedThreadPool(2);
-        exec.submit(() -> readStream(out, null));
+        ExecutorService exec = Executors.newFixedThreadPool(1);
         exec.submit(() -> readStream(err, style));
     }
+
+
 
     private void readStream(BufferedReader reader, Style style) {
         String line;

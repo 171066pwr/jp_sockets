@@ -4,7 +4,6 @@ import com.mycompany.app.common.*;
 import com.mycompany.app.common.api.EnvironmentApi;
 import com.mycompany.app.common.api.RetentionBasinApi;
 import com.mycompany.app.common.api.RiverSectionApi;
-import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 import java.util.HashMap;
@@ -63,7 +62,7 @@ public class RiverSection extends Service implements RemoteSubscriber {
 
     @Override
     public Response subscribeToRemote(RemoteInfo remote) {
-        return updateRemote(remote, EnvironmentApi.ASSIGN_RIVER_SECTION, getRemoteInfo().toString());
+        return updateRemote(remote, EnvironmentApi.ASSIGN_RIVER_SECTION, getSelfRemoteInfo().toString());
     }
 
     private int getCurrentInflows() {

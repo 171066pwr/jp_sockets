@@ -49,7 +49,7 @@ public class RemoteInfo {
         return Objects.hash(host, name, port);
     }
 
-    static class RemoteInfoParseException extends RuntimeException {
+    public static class RemoteInfoParseException extends RuntimeException {
         public RemoteInfoParseException(String message) {
             super("Failed to parse remote info: " + message);
         }

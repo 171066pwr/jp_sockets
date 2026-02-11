@@ -1,4 +1,4 @@
-package com.mycompany.app.gui;
+package com.mycompany.app.common.gui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,7 +7,7 @@ public class LogPanel extends JPanel implements Thread.UncaughtExceptionHandler{
     private OutputHijackingTextPane logTP;
     private JButton clearBT;
 
-    LogPanel() {
+    public LogPanel() {
         super();
         setLayout(new BorderLayout(5, 5));
         logTP = new OutputHijackingTextPane();
@@ -16,7 +16,7 @@ public class LogPanel extends JPanel implements Thread.UncaughtExceptionHandler{
         clearBT = new JButton("Clear");
         add(clearBT, BorderLayout.SOUTH);
         clearBT.addActionListener(actionEvent -> logTP.setText(""));
-        setPreferredSize(new Dimension(600, 128));
+        setPreferredSize(new Dimension(500, 100));
     }
 
     @Override

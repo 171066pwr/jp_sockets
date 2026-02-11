@@ -1,29 +1,20 @@
 package com.mycompany.app.gui;
 
-import com.mycompany.app.common.RemoteInfo;
+import com.mycompany.app.common.gui.ServicePanel;
+import com.mycompany.app.model.Environment;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
-import java.util.List;
-
-public class EnvironmentPanel extends JPanel {
-    private JTextField infoTF;
+public class EnvironmentPanel extends ServicePanel<Environment> {
     private JTextField rainfallTF;
     private JButton rainfallBT;
     private JCheckBox rainGeneratorCB;
-    private RemoteList remotes;
-    private JTextField remotesTF;
 
     EnvironmentPanel() {
-        super(new GridLayout(4, 2, 5, 5));
-        JLabel infoLabel = new JLabel("Environment: ");
-        infoTF = new JTextField();
-        infoTF.setEditable(false);
-        this.add(infoLabel);
-        this.add(infoTF);
-
+        super();
+        JPanel generatorPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         rainfallTF = new JTextField("100");
         rainfallTF.addActionListener(e -> {
             try {
@@ -33,22 +24,22 @@ public class EnvironmentPanel extends JPanel {
                 rainfallBT.setEnabled(false);
             }
         });
-        rainfallBT = new JButton("Apply");
-        rainGeneratorCB = new JCheckBox("Rain Generator");
+        Label rainfallLB = new Label("Rainfall volume (avg value in auto mode");
+        rainfallBT = new JButton("Apply rainfall");
+        rainGeneratorCB = new JCheckBox("Auto rain generator");
         rainGeneratorCB.setSelected(true);
+        generatorPanel.add(rainfallLB);
+        generatorPanel.add(rainfallTF);
+        generatorPanel.add(rainGeneratorCB);
+        generatorPanel.add(new JSeparator());
+        generatorPanel.add(new JSeparator());
+        generatorPanel.add(rainfallBT);
+        this.add(generatorPanel);
+    }
 
-        this.add(rainfallTF);
-        this.add(rainfallBT);
-        this.add(rainGeneratorCB);
-
-        JLabel listLabel = new JLabel("Subscribed remotes: ");
-        remotes = new RemoteList();
-        remotes.addListSelectionListener(e -> remotesTF.setText(remotes.getSelectedValue().toString()));
-        this.add(listLabel);
-        this.add(remotes);
-        remotesTF = new JTextField();
-        remotesTF.setEditable(false);
-        this.add(remotesTF);
+    @Override
+    public String getName() {
+        return "Environment";
     }
 
     public void addRainValueListener(ActionListener l) {
@@ -57,14 +48,6 @@ public class EnvironmentPanel extends JPanel {
 
     public void addGeneratorToggleListener(ActionListener l) {
         rainGeneratorCB.addActionListener(l);
-    }
-
-    public void setRemotesList(List<RemoteInfo> remoteList) {
-        remotes.setRemotes(remoteList);
-    }
-
-    public void setSelfInfo(RemoteInfo remote) {
-        infoTF.setText(remote.toString());
     }
 
     public int getRainfall() {
